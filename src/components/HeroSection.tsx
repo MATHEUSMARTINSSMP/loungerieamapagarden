@@ -69,6 +69,7 @@ const HeroSection = () => {
             <div
               className="h-full bg-cover bg-center bg-no-repeat"
               style={{ backgroundImage: `url(${slide.image})` }}
+              data-elevea-image={`hero-bg-${index}`}
             >
               <div className="absolute inset-0 bg-elegant-black/35" />
             </div>
@@ -78,10 +79,10 @@ const HeroSection = () => {
         {/* Conteúdo */}
         <div className="absolute inset-0 flex items-center justify-center">
           <div className="text-center text-pure-white px-6 max-w-4xl mx-auto">
-            <h1 className="hero-text mb-6 drop-shadow-lg">
+            <h1 className="hero-text mb-6 drop-shadow-lg" data-elevea-text="hero-title">
               {slides[currentSlide].title}
             </h1>
-            <p className="text-xl md:text-2xl mb-8 font-light leading-relaxed drop-shadow-md max-w-3xl mx-auto">
+            <p className="text-xl md:text-2xl mb-8 font-light leading-relaxed drop-shadow-md max-w-3xl mx-auto" data-elevea-text="hero-subtitle">
               {slides[currentSlide].subtitle}
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">

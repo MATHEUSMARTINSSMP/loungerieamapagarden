@@ -5,10 +5,10 @@ const LocationSection = () => {
     <section id="localizacao" className="py-20 bg-gradient-elegant">
       <div className="container mx-auto px-6">
         <div className="text-center max-w-3xl mx-auto mb-16">
-          <h2 className="section-title text-primary">
+          <h2 className="section-title text-primary" data-elevea-text="location-title">
             Visite Nossa Loja
           </h2>
-          <p className="body-elegant text-lg">
+          <p className="body-elegant text-lg" data-elevea-text="location-subtitle">
             Estamos localizadas no Amapá Garden Shopping, prontas para recebê-la com toda sofisticação da Loungerie.
           </p>
         </div>
@@ -24,7 +24,7 @@ const LocationSection = () => {
                   <h3 className="font-serif text-xl font-medium text-primary mb-2">
                     Endereço
                   </h3>
-                  <p className="body-elegant">
+                  <p className="body-elegant" data-elevea-text="location-address">
                     Amapá Garden Shopping<br />
                     Rodovia Juscelino Kubitschek, 2141, Loja 154<br />
                     Macapá - AP
@@ -47,7 +47,7 @@ const LocationSection = () => {
                   <h3 className="font-serif text-xl font-medium text-primary mb-2">
                     Horários de Funcionamento
                   </h3>
-                  <div className="body-elegant space-y-1">
+                  <div className="body-elegant space-y-1" data-elevea-text="location-hours">
                     <p><span className="font-medium">Segunda a sábado:</span> 10h – 22h</p>
                     <p><span className="font-medium">Domingos e feriados:</span> 15h – 21h</p>
                   </div>

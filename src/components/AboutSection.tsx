@@ -3,23 +3,23 @@ const AboutSection = () => {
     <section className="py-20 bg-gradient-elegant">
       <div className="container mx-auto px-6">
         <div className="max-w-4xl mx-auto text-center">
-          <h2 className="section-title text-primary">
+          <h2 className="section-title text-primary" data-elevea-text="about-title">
             Sobre a Marca
           </h2>
           
           <div className="space-y-8">
-            <p className="body-elegant text-xl leading-relaxed">
+            <p className="body-elegant text-xl leading-relaxed" data-elevea-text="about-intro">
               Inspirada na elegância parisiense, a <span className="font-semibold text-accent">Loungerie</span> foi criada 
               para transformar a experiência da lingerie no Brasil.
             </p>
             
-            <p className="body-elegant text-lg leading-relaxed mt-6">
+            <p className="body-elegant text-lg leading-relaxed mt-6" data-elevea-text="about-description">
               Cada peça é desenvolvida com atenção aos detalhes, misturando conforto e sensualidade, 
               para que cada mulher se sinta confiante, linda e autêntica.
             </p>
             
             <div className="mt-12 p-8 bg-accent/10 rounded-2xl border border-accent/20">
-              <p className="text-xl font-light text-primary leading-relaxed">
+              <p className="text-xl font-light text-primary leading-relaxed" data-elevea-text="about-mission">
                 Desde sua fundação, a Loungerie redefiniu o conceito de moda íntima no Brasil. 
                 Nosso propósito é empoderar mulheres para que se sintam lindas, confiantes e 
                 autênticas em todos os momentos.

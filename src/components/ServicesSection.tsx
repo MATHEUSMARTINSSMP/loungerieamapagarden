@@ -23,10 +23,10 @@ const ServicesSection = () => {
     <section className="py-20 bg-secondary">
       <div className="container mx-auto px-6">
         <div className="text-center max-w-3xl mx-auto mb-16">
-          <h2 className="section-title text-primary">
+          <h2 className="section-title text-primary" data-elevea-text="services-title">
             Nossas Linhas
           </h2>
-          <p className="body-elegant text-lg">
+          <p className="body-elegant text-lg" data-elevea-text="services-subtitle">
             Descubra nossa curadoria exclusiva de moda íntima, pensada para cada momento da sua vida.
           </p>
         </div>
@@ -40,10 +40,10 @@ const ServicesSection = () => {
                   <service.icon className="w-12 h-12 text-accent" />
                 </div>
               </div>
-              <h3 className="text-lg font-serif font-medium mb-4 text-primary leading-tight">
+              <h3 className="text-lg font-serif font-medium mb-4 text-primary leading-tight" data-elevea-text={`service-title-${index}`}>
                 {service.title}
               </h3>
-              <p className="text-muted-foreground leading-relaxed">
+              <p className="text-muted-foreground leading-relaxed" data-elevea-text={`service-description-${index}`}>
                 {service.description}
               </p>
             </div>

@@ -39,7 +39,7 @@ const TestimonialsSection = () => {
     <section className="py-20 bg-secondary">
       <div className="container mx-auto px-6">
         <div className="text-center max-w-3xl mx-auto mb-16">
-          <h2 className="section-title text-primary">
+          <h2 className="section-title text-primary" data-elevea-text="testimonials-title">
             O Que Nossas Clientes Dizem
           </h2>
         </div>
@@ -52,15 +52,15 @@ const TestimonialsSection = () => {
               ))}
             </div>
             
-            <blockquote className="text-xl lg:text-2xl font-light text-primary leading-relaxed mb-8 italic">
+            <blockquote className="text-xl lg:text-2xl font-light text-primary leading-relaxed mb-8 italic" data-elevea-text={`testimonial-text-${currentTestimonial}`}>
               "{testimonials[currentTestimonial].text}"
             </blockquote>
             
             <div>
-              <p className="font-serif text-lg font-medium text-primary">
+              <p className="font-serif text-lg font-medium text-primary" data-elevea-text={`testimonial-author-${currentTestimonial}`}>
                 {testimonials[currentTestimonial].author}
               </p>
-              <p className="text-muted-foreground">
+              <p className="text-muted-foreground" data-elevea-text={`testimonial-role-${currentTestimonial}`}>
                 {testimonials[currentTestimonial].role}
               </p>
             </div>
