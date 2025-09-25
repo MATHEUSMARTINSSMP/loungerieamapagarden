@@ -9,6 +9,7 @@ export default defineConfig(({ mode }) => ({
     // For Replit environment (temporary testing)
     host: "0.0.0.0",
     port: 5000,
+    strictPort: true,
     // Original Netlify config (preserve for deployment):
     // host: "::",
     // port: 8080,

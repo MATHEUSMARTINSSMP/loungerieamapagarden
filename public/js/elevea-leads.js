@@ -31,12 +31,13 @@
         }
     }
     
-    // Função para capturar formulários
+    // Função para capturar formulários usando event delegation (funciona em SPAs)
     function attachFormTracking() {
-        const forms = document.querySelectorAll('form');
-        
-        forms.forEach(form => {
-            form.addEventListener('submit', function(e) {
+        // Event delegation - captura formulários novos adicionados dinamicamente
+        document.addEventListener('submit', function(e) {
+            // Verificar se é um formulário
+            if (e.target.tagName === 'FORM') {
+                const form = e.target;
                 const formData = new FormData(form);
                 const leadData = {};
                 
@@ -57,8 +58,8 @@
                 if (leadData.email || leadData.phone) {
                     sendLead(leadData);
                 }
-            });
-        });
+            }
+        }, { capture: true });
     }
     
     // Executar quando página carregar
