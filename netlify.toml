@@ -1,0 +1,23 @@
+[build]
+  functions = "netlify/functions"
+
+[functions]
+  directory = "netlify/functions"
+  node_bundler = "esbuild"
+
+# Webhook do MP (se usar)
+[[redirects]]
+  from = "/api/mp-webhook"
+  to   = "/.netlify/functions/mp-webhook"
+  status = 200
+
+# Ativar a Edge Function de guarda no site do cliente
+[[edge_functions]]
+path = "/*"
+function = "guard-client"
+
+# SPA fallback (deixe por último)
+[[redirects]]
+  from = "/*"
+  to   = "/index.html"
+  status = 200
