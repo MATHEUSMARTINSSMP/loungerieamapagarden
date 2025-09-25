@@ -6,8 +6,12 @@ import { componentTagger } from "lovable-tagger";
 // https://vitejs.dev/config/
 export default defineConfig(({ mode }) => ({
   server: {
-    host: "::",
-    port: 8080,
+    // For Replit environment (temporary testing)
+    host: "0.0.0.0",
+    port: 5000,
+    // Original Netlify config (preserve for deployment):
+    // host: "::",
+    // port: 8080,
   },
   plugins: [
     react(),
