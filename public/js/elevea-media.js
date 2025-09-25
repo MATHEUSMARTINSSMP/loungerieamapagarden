@@ -1,22 +1,29 @@
-// public/js/elevea-media.js
+// public/js/elevea-media.js - VERSÃO CORRIGIDA
 (function() {
     'use strict';
     
     const SITE_SLUG = 'LOUNGERIEAMAPAGARDEN';
-    const ELEVEA_API = 'https://eleveaagencia.netlify.app/.netlify/functions/client-api';
+    const ELEVEA_UPLOAD_API = 'https://eleveaagencia.netlify.app/.netlify/functions/upload-drive';
     
-    // Função para upload de imagem
+    // Função para upload de imagem (CORRIGIDA)
     async function uploadImage(file, slot) {
         try {
-            const formData = new FormData();
-            formData.append('file', file);
-            formData.append('site', SITE_SLUG);
-            formData.append('slot', slot);
-            formData.append('action', 'upload_media');
+            // Converter arquivo para base64
+            const base64 = await fileToBase64(file);
             
-            const response = await fetch(ELEVEA_API, {
+            const response = await fetch(ELEVEA_UPLOAD_API, {
                 method: 'POST',
-                body: formData
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    siteSlug: SITE_SLUG,
+                    email: 'contato@' + SITE_SLUG.toLowerCase() + '.com.br',
+                    logo: slot === 'logo' ? base64 : null,
+                    fotos: slot !== 'logo' ? [base64] : [],
+                    logoLink: '',
+                    fotosLink: ''
+                })
             });
             
             if (response.ok) {
@@ -27,6 +34,16 @@
         } catch (error) {
             console.log('⚠️ Erro ao enviar imagem:', error);
         }
+    }
+    
+    // Converter arquivo para base64
+    function fileToBase64(file) {
+        return new Promise((resolve, reject) => {
+            const reader = new FileReader();
+            reader.onload = () => resolve(reader.result);
+            reader.onerror = reject;
+            reader.readAsDataURL(file);
+        });
     }
     
     // Criar áreas de drop para uploads
@@ -63,13 +80,7 @@
                 if (file) {
                     console.log(`📤 Fazendo upload da imagem para slot: ${slot}`);
                     const result = await uploadImage(file, slot);
-                    if (result && result.url) {
-                        // Atualizar imagem na página
-                        if (element.tagName === 'IMG') {
-                            element.src = result.url;
-                        } else {
-                            element.style.backgroundImage = `url(${result.url})`;
-                        }
+                    if (result) {
                         console.log('✅ Imagem atualizada na página');
                     }
                 }

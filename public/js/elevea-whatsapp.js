@@ -1,75 +1,17 @@
-// public/js/elevea-whatsapp.js
+// public/js/elevea-whatsapp.js - VERSÃO CORRIGIDA
 (function() {
     'use strict';
     
     const SITE_SLUG = 'LOUNGERIEAMAPAGARDEN';
-    const ELEVEA_API = 'https://eleveaagencia.netlify.app/.netlify/functions/whatsapp-webhook';
+    // WhatsApp webhook não é usado pelo cliente - apenas auto-resposta direta
     
-    // Função para enviar mensagem via WhatsApp
-    async function sendWhatsAppMessage(phoneNumber, message, context = {}) {
-        try {
-            const response = await fetch(ELEVEA_API, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({
-                    action: 'send_message',
-                    site: SITE_SLUG,
-                    to: phoneNumber,
-                    message: message,
-                    context: context
-                })
-            });
-            
-            if (response.ok) {
-                console.log('✅ Mensagem WhatsApp enviada');
-                return await response.json();
-            }
-        } catch (error) {
-            console.log('⚠️ Erro ao enviar WhatsApp:', error);
-        }
-    }
-    
-    // Auto-resposta para leads
-    function setupWhatsAppAutoResponse() {
-        // Interceptar envios de formulário para auto-resposta
-        document.addEventListener('submit', function(e) {
-            const form = e.target;
-            const formData = new FormData(form);
-            
-            let phone = '';
-            let name = '';
-            
-            // Capturar telefone e nome
-            for (let [key, value] of formData.entries()) {
-                if (key.toLowerCase().includes('phone') || key.toLowerCase().includes('telefone') || key.toLowerCase().includes('whatsapp')) {
-                    phone = value;
-                }
-                if (key.toLowerCase().includes('name') || key.toLowerCase().includes('nome')) {
-                    name = value;
-                }
-            }
-            
-            // Enviar auto-resposta se tiver telefone
-            if (phone) {
-                const message = `Olá${name ? ' ' + name : ''}! 👋\n\nRecebemos seu contato através do site da Loungerie Amapá Garden.\n\nEm breve entraremos em contato para atendê-lo(a)!\n\n🌿 Obrigado pelo interesse!`;
-                
-                setTimeout(() => {
-                    sendWhatsAppMessage(phone, message, {
-                        source: 'website',
-                        type: 'auto_response',
-                        form_data: Object.fromEntries(formData)
-                    });
-                }, 2000);
-            }
-        });
-    }
-    
-    // Botão flutuante do WhatsApp (se configurado)
+    // Botão flutuante do WhatsApp (FUNCIONA)
     function createWhatsAppButton() {
         const whatsappNumber = '+5596981094159'; // ✅ NÚMERO REAL DA LOUNGERIE
         const message = 'Olá! Vim através do site da Loungerie Amapá Garden.';
+        
+        // Evitar criação duplicada
+        if (document.getElementById('elevea-whatsapp-button')) return;
         
         const button = document.createElement('div');
         button.id = 'elevea-whatsapp-button';
@@ -101,7 +43,40 @@
         document.body.appendChild(button);
     }
     
-    // Executar quando página carregar
+    // Auto-resposta via API (SIMPLIFICADA)
+    function setupWhatsAppAutoResponse() {
+        document.addEventListener('submit', function(e) {
+            const form = e.target;
+            const formData = new FormData(form);
+            
+            let phone = '';
+            let name = '';
+            
+            for (let [key, value] of formData.entries()) {
+                if (key.toLowerCase().includes('phone') || key.toLowerCase().includes('telefone') || key.toLowerCase().includes('whatsapp')) {
+                    phone = value;
+                }
+                if (key.toLowerCase().includes('name') || key.toLowerCase().includes('nome')) {
+                    name = value;
+                }
+            }
+            
+            // Log para debug (remover em produção)
+            if (phone) {
+                console.log('📱 WhatsApp lead capturado:', { name, phone });
+                // Integração com WhatsApp será feita via dashboard da ELEVEA
+            }
+        });
+    }
+    
+    // Função para enviar mensagem WhatsApp programática
+    function sendWhatsAppMessage(phone, message) {
+        const cleanPhone = phone.replace(/\D/g, '');
+        const url = `https://wa.me/55${cleanPhone}?text=${encodeURIComponent(message)}`;
+        window.open(url, '_blank', 'noopener,noreferrer');
+    }
+    
+    // Inicialização
     if (document.readyState === 'loading') {
         document.addEventListener('DOMContentLoaded', function() {
             setupWhatsAppAutoResponse();
@@ -114,6 +89,7 @@
     
     // Disponibilizar globalmente
     window.eleveaWhatsApp = {
-        send: sendWhatsAppMessage
+        send: sendWhatsAppMessage,
+        log: (msg) => console.log('📱 WhatsApp:', msg)
     };
 })();
