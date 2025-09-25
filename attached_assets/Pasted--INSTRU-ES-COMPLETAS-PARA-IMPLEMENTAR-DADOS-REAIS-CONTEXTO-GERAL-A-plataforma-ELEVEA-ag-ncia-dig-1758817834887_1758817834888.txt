@@ -1,0 +1,280 @@
+📋 INSTRUÇÕES COMPLETAS PARA IMPLEMENTAR DADOS REAIS
+CONTEXTO GERAL
+A plataforma ELEVEA (agência digital) tem um dashboard que mostra dados analíticos dos sites dos clientes. Atualmente usa dados fictícios, mas já tem toda a infraestrutura para dados reais implementada. O site do cliente precisa enviar dados reais para o dashboard da ELEVEA funcionar corretamente.
+
+⚠️ IMPORTANTE: O layout do site do cliente NÃO muda. Só adicionamos infraestrutura invisível de tracking.
+
+🎯 REPOSITÓRIO DO CLIENTE
+https://github.com/mathmartins-star/loungerieamapagarden.git
+🔧 MUDANÇAS NECESSÁRIAS NO SITE DO CLIENTE
+1. ADICIONAR PIXEL DE TRACKING
+📁 Localização: Criar arquivo public/js/elevea-analytics.js
+
+// public/js/elevea-analytics.js
+(function() {
+    'use strict';
+    
+    // Configuração - ALTERE AQUI O SITE_SLUG
+    const SITE_SLUG = 'LOUNGERIEAMAPAGARDEN'; // ⚠️ IMPORTANTE: Usar o slug correto
+    const ELEVEA_API = 'https://eleveaagencia.netlify.app/.netlify/functions/client-api';
+    
+    // Função para capturar dados da visita
+    function getVisitData() {
+        return {
+            path: window.location.pathname,
+            userAgent: navigator.userAgent,
+            referrer: document.referrer || '',
+            timestamp: new Date().toISOString(),
+            screen: {
+                width: screen.width,
+                height: screen.height
+            },
+            viewport: {
+                width: window.innerWidth,
+                height: window.innerHeight
+            }
+        };
+    }
+    
+    // Função para enviar hit para ELEVEA
+    async function recordHit() {
+        try {
+            const visitData = getVisitData();
+            
+            const response = await fetch(ELEVEA_API, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    action: 'record_hit',
+                    site: SITE_SLUG,
+                    meta: visitData
+                })
+            });
+            
+            if (response.ok) {
+                console.log('✅ Hit registrado na ELEVEA');
+            }
+        } catch (error) {
+            console.log('⚠️ Erro ao registrar hit:', error);
+        }
+    }
+    
+    // Executar quando página carregar
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', recordHit);
+    } else {
+        recordHit();
+    }
+    
+    // Registrar mudanças de página (SPA)
+    let currentPath = window.location.pathname;
+    setInterval(() => {
+        if (window.location.pathname !== currentPath) {
+            currentPath = window.location.pathname;
+            recordHit();
+        }
+    }, 1000);
+})();
+2. ADICIONAR TRACKING DE LEADS
+📁 Localização: Criar arquivo public/js/elevea-leads.js
+
+// public/js/elevea-leads.js
+(function() {
+    'use strict';
+    
+    const SITE_SLUG = 'LOUNGERIEAMAPAGARDEN'; // ⚠️ IMPORTANTE: Mesmo slug
+    const ELEVEA_API = 'https://eleveaagencia.netlify.app/.netlify/functions/client-api';
+    
+    // Função para enviar lead
+    async function sendLead(leadData) {
+        try {
+            const response = await fetch(ELEVEA_API, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    action: 'create_lead',
+                    site: SITE_SLUG,
+                    name: leadData.name || '',
+                    email: leadData.email || '',
+                    phone: leadData.phone || '',
+                    source: 'site'
+                })
+            });
+            
+            if (response.ok) {
+                console.log('✅ Lead enviado para ELEVEA');
+            }
+        } catch (error) {
+            console.log('⚠️ Erro ao enviar lead:', error);
+        }
+    }
+    
+    // Função para capturar formulários
+    function attachFormTracking() {
+        const forms = document.querySelectorAll('form');
+        
+        forms.forEach(form => {
+            form.addEventListener('submit', function(e) {
+                const formData = new FormData(form);
+                const leadData = {};
+                
+                // Capturar campos comuns
+                for (let [key, value] of formData.entries()) {
+                    if (key.toLowerCase().includes('name') || key.toLowerCase().includes('nome')) {
+                        leadData.name = value;
+                    }
+                    if (key.toLowerCase().includes('email') || key.toLowerCase().includes('e-mail')) {
+                        leadData.email = value;
+                    }
+                    if (key.toLowerCase().includes('phone') || key.toLowerCase().includes('telefone') || key.toLowerCase().includes('whatsapp')) {
+                        leadData.phone = value;
+                    }
+                }
+                
+                // Enviar lead se tiver pelo menos email ou telefone
+                if (leadData.email || leadData.phone) {
+                    sendLead(leadData);
+                }
+            });
+        });
+    }
+    
+    // Executar quando página carregar
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', attachFormTracking);
+    } else {
+        attachFormTracking();
+    }
+})();
+3. MODIFICAR HTML PRINCIPAL
+📁 Localização: index.html (ou arquivo HTML principal)
+
+🔍 Encontrar: A tag </head>
+
+➕ Adicionar ANTES de </head>:
+
+<!-- ELEVEA Analytics - Não remover -->
+<script src="./js/elevea-analytics.js" async></script>
+<script src="./js/elevea-leads.js" async></script>
+<!-- Fim ELEVEA Analytics -->
+4. CONFIGURAR FEEDBACK/AVALIAÇÕES (OPCIONAL)
+📁 Localização: Criar arquivo public/js/elevea-feedback.js
+
+// public/js/elevea-feedback.js
+(function() {
+    'use strict';
+    
+    const SITE_SLUG = 'LOUNGERIEAMAPAGARDEN';
+    const ELEVEA_API = 'https://eleveaagencia.netlify.app/.netlify/functions/client-api';
+    
+    // Função para enviar feedback
+    async function sendFeedback(feedbackData) {
+        try {
+            const response = await fetch(ELEVEA_API, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    action: 'create_feedback',
+                    site: SITE_SLUG,
+                    rating: feedbackData.rating,
+                    comment: feedbackData.comment || '',
+                    name: feedbackData.name || '',
+                    email: feedbackData.email || '',
+                    phone: feedbackData.phone || ''
+                })
+            });
+            
+            if (response.ok) {
+                console.log('✅ Feedback enviado para ELEVEA');
+            }
+        } catch (error) {
+            console.log('⚠️ Erro ao enviar feedback:', error);
+        }
+    }
+    
+    // Disponibilizar globalmente para uso manual
+    window.eleveaFeedback = sendFeedback;
+})();
+🎮 COMO INTEGRAR NO HTML
+EXEMPLO DE USO MANUAL (se precisar):
+<!-- Para avaliações por estrelas -->
+<div class="rating">
+    <button onclick="eleveaFeedback({rating: 5, comment: 'Excelente!'})">⭐⭐⭐⭐⭐</button>
+    <button onclick="eleveaFeedback({rating: 4, comment: 'Muito bom!'})">⭐⭐⭐⭐</button>
+    <!-- etc -->
+</div>
+✅ CHECKLIST DE IMPLEMENTAÇÃO
+📋 PASSOS OBRIGATÓRIOS:
+✅ Clonar repositório:
+git clone https://github.com/mathmartins-star/loungerieamapagarden.git
+cd loungerieamapagarden
+✅ Criar pasta js (se não existir):
+mkdir -p public/js
+✅ Criar arquivos JavaScript:
+public/js/elevea-analytics.js (OBRIGATÓRIO)
+public/js/elevea-leads.js (OBRIGATÓRIO)
+public/js/elevea-feedback.js (OPCIONAL)
+✅ Modificar HTML principal:
+Adicionar scripts antes de </head>
+✅ VERIFICAR SITE_SLUG:
+Confirmar que LOUNGERIEAMAPAGARDEN é o slug correto
+Deve ser o mesmo usado no dashboard da ELEVEA
+✅ Testar localmente:
+Abrir site em navegador
+Verificar console (F12) se aparece "✅ Hit registrado na ELEVEA"
+✅ Fazer commit e push:
+git add .
+git commit -m "Adicionar tracking ELEVEA para dados reais"
+git push origin main
+🧪 COMO TESTAR SE ESTÁ FUNCIONANDO
+1. TESTE LOCAL:
+Abrir site em navegador
+Abrir DevTools (F12) → Console
+Recarregar página
+Verificar se aparece: ✅ Hit registrado na ELEVEA
+2. TESTE DE LEADS:
+Preencher e enviar qualquer formulário do site
+Verificar console: ✅ Lead enviado para ELEVEA
+3. VERIFICAR NO DASHBOARD ELEVEA:
+Acessar dashboard da ELEVEA
+Ir na seção Analytics
+Verificar se dados reais aparecem (pode demorar alguns minutos)
+⚠️ PONTOS CRÍTICOS
+🔑 SITE_SLUG CORRETO:
+Deve ser exatamente o mesmo usado na ELEVEA
+Formato: LOUNGERIEAMAPAGARDEN (maiúsculo, sem espaços)
+Confirmar com administrador da ELEVEA
+🌐 URL DA API:
+https://eleveaagencia.netlify.app/.netlify/functions/client-api
+NÃO alterar esta URL
+📱 COMPATIBILIDADE:
+Scripts funcionam em todos navegadores modernos
+Não interfere com layout existente
+Execução assíncrona (não trava o site)
+🚨 EM CASO DE PROBLEMAS
+Script não carrega:
+Verificar se pasta public/js/ existe
+Verificar caminho no HTML: ./js/elevea-analytics.js
+Console mostra erro de CORS:
+Normal em alguns casos, tracking ainda funciona
+API da ELEVEA aceita requests de qualquer origem
+Dados não aparecem no dashboard:
+Verificar SITE_SLUG
+Aguardar até 5 minutos para sincronização
+Verificar se site está publicado (não local)
+🎯 RESULTADO FINAL
+Após implementação:
+
+✅ Site do cliente mantém layout idêntico
+✅ Dashboard da ELEVEA mostra dados reais
+✅ Tracking de visitas automático
+✅ Captura de leads em formulários
+✅ Sistema de feedback funcionando
+✅ Zero impacto visual no site
+📊 O dashboard da ELEVEA agora mostrará dados concretos e reais do site do cliente!
